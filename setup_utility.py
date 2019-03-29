@@ -1,3 +1,21 @@
+#  
+#      Algos - A collection of toy algos for machine learning.
+#  
+#      Copyright (C) 2019 Jorge M. Faleiro Jr.
+#  
+#      This program is free software: you can redistribute it and/or modify
+#      it under the terms of the GNU Affero General Public License as published
+#      by the Free Software Foundation, either version 3 of the License, or
+#      (at your option) any later version.
+#  
+#      This program is distributed in the hope that it will be useful,
+#      but WITHOUT ANY WARRANTY; without even the implied warranty of
+#      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#      GNU Affero General Public License for more details.
+#  
+#      You should have received a copy of the GNU Affero General Public License
+#      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#  
 
 # TODO move to a separate setput utility project
 
@@ -15,6 +33,7 @@ except ImportError:
     CleanCommand = None
 
 BehaveTestCommand = behave_test
+
 
 class ToxCommand(TestCommand):
     """
@@ -45,8 +64,8 @@ class LicenseHeaderCommand(Command):
     """
     description = 'add standard license header to all source files'
     user_options = [
-        ('header-file', 'f', 'header license file'),
-        ('extension', 'e', 'source file extension')
+        ('header-file=', 'f', 'header license file'),
+        ('extension=', 'e', 'source file extension'),
         ]
 
     def initialize_options(self):
@@ -58,15 +77,16 @@ class LicenseHeaderCommand(Command):
         assert self.extension is not None, 'extension is required'
 
     def run(self):
-        assert os.path.isfile(self.header_file), "header file '%s' is not a file" % self.header_file
-        for filename in glob.iglob("**/*.py", recursive=True):
+        if not os.path.isfile(self.header_file):
+            raise Exception("header file '%s' is not a file" % self.header_file)
+        for filename in glob.iglob("**/*%s" % self.extension, recursive=True):
             print(filename)
             with open(filename, 'r') as file:
                 lines = file.readlines()
             output = []
-            phases = ('adding_hashbangs', 
-                      'removing_previous_comments', 
-                      'adding_header', 
+            phases = ('adding_hashbangs',
+                      'removing_previous_comments',
+                      'adding_header',
                       'adding_source')
             phase = phases[0] 
             for line in lines:
@@ -83,11 +103,13 @@ class LicenseHeaderCommand(Command):
                         phase = phases[2]
                 if phase == phases[2]:
                     with open(self.header_file, 'r') as header_file:
-                        output.extend(['# ' + l for l in header_file.readlines()])
+                        header_lines = [l if l.endswith('\n') 
+                                          else l + '\n' for l in header_file.readlines()]
+                        output.extend(['# ' + l for l in header_lines])
                     phase = phases[3]
                 if phase == phases[3]:
-                    output.append(line)    
-            print(output)
-            
-                    
+                    output.append(line)  
+            with open(filename, 'w') as file:
+                for line in output:
+                    file.write(line)  
 
