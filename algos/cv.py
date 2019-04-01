@@ -16,12 +16,19 @@
 #      You should have received a copy of the GNU Affero General Public License
 #      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+import logging
+
 from algos.math import rmse
-import numpy as np
 import pandas as pd
 
 
+logger = logging.Logger(__name__)
+
+
 def cross_validation_split(ds, folds):
+    """
+    split dataframe in folds
+    """
     fold_size = len(ds) // folds
     result = []
     for i in range(0, len(ds), fold_size):
@@ -29,18 +36,24 @@ def cross_validation_split(ds, folds):
     return result
 
 
-def evaluate(dataset, algorithm, response, folds, **args):
+def evaluate(dataset, algorithm, response, folds):
+    """
+    cross validate algorithm in n folds
+    """
     folds = cross_validation_split(dataset, folds)
+    scores = []
     for i, fold in enumerate(folds):
-        print('fold %d' % i)
         test_set = fold
         train_folds = folds.copy()
         del train_folds[i]
         train_set = pd.concat(train_folds)
-        predictions = algorithm(train_set, test_set, response, **args)
-        actuals = fold[response].values
-        score = rmse(actuals, predictions)
-    return [1]
+        features, responses = split_feature_response(train_set, response)
+        algorithm.fit(features, responses)
+        features_tests, responses_tests = split_feature_response(
+            test_set, response)
+        predictions = algorithm.predict(features_tests)
+        scores += [rmse(responses_tests.values, predictions.values)]
+    return scores
 
 
 def split_feature_response(df, response):
