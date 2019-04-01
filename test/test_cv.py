@@ -16,35 +16,27 @@
 #      You should have received a copy of the GNU Affero General Public License
 #      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #  
-from abc import ABC, abstractmethod
+
+import unittest
+
+from algos.cv import split_feature_response
+import pandas as pd
 
 
-class Algorithm(ABC):
+class Test(unittest.TestCase):
 
-    def __init__(self):
-        self.trained = False
+    def test_split_feature_response(self):
+        wines = pd.read_csv('../data/wines/winequality-red.csv', sep=';')
+        feature_column = 'quality'
+        f, r = split_feature_response(wines, feature_column)
+        self.assertEqual(len(wines), len(f))
+        self.assertEqual(len(wines), len(r))
+        self.assertEqual(set(f.columns) - set(r.columns),
+                         set(f.columns) - set([feature_column]))
+        self.assertFalse(feature_column in f.columns)
+        self.assertTrue(feature_column in r.columns)
 
-    def fit(self, features, responses):
-        self.do_fit(features, responses)
-        self.trained = True
 
-    @abstractmethod
-    def do_fit(self, features, responses):
-        pass
-
-    def predict(self, responses):
-        if not self.trained:
-            raise Exception('not trained')
-        return self.do_predict(responses)
-
-    @abstractmethod
-    def do_predict(self, responses):
-        pass
-
-    def reset(self):
-        self.do_reset()
-        self.trained = False
-
-    @abstractmethod
-    def do_reset(self):
-        pass
+if __name__ == "__main__":
+    #import sys;sys.argv = ['', 'Test.testName']
+    unittest.main()

@@ -17,17 +17,23 @@
 #      You should have received a copy of the GNU Affero General Public License
 #      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #  
+import os
+
 from setuptools import setup, find_packages
 from setuptools.dist import Distribution
-from setup_utility import BehaveTestCommand, CleanCommand, LicenseHeaderCommand
-import os
+
+from setup_utility import (
+    BehaveTestCommand,
+    CleanCommand,
+    LicenseHeaderCommand,
+)
 
 
 class GradleDistribution(Distribution, object):
-
     def __init__(self, attrs):
         attrs['name'] = os.getenv('PYGRADLE_PROJECT_NAME')
         attrs['version'] = os.getenv('PYGRADLE_PROJECT_VERSION')
+
 
 cmd_classes = {
     'license_headers': LicenseHeaderCommand,
@@ -47,16 +53,18 @@ setup(
     license="Affero GPL, see LICENSE for details",
     packages=find_packages(),
     cmdclass=cmd_classes,
-    setup_requires=['setupext-janitor'],
-#    install_requires=['matplotlib','numpy','pipe','scipy','ipython[all]','networkx','trellis'],
-    tests_require=['nose', 'tox'],
+    setup_requires=[
+        'setupext-janitor',
+        'behave',
+        'nose>=1.0'
+    ],
+    tests_require=[
+        'tox',
+    ],
     test_suite='nose.collector',
-#    install_requires=['matplotlib','pandas','numpy','pipe','scipy','ipython[all]','pipe','networkx'],
-    install_requires=['pandas>=0.13.1',
-                      'ipython[all]>=3.1.0',
-                      'pipe>=1.4.1',
-                      'networkx>=1.9.1',
-                      'seaborn>=0.5.1'],
+    install_requires=[
+        'pandas>=0.24.2',
+    ],
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
@@ -66,6 +74,5 @@ setup(
         "Operating System :: OS Independent",
         "Topic :: Software Development",
         "Topic :: Software Development :: Libraries :: Python Modules"
-        ]
+    ]
 )
-    

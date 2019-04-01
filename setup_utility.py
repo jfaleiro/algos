@@ -17,14 +17,15 @@
 #      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #  
 
-# TODO move to a separate setput utility project
+# TODO move to a separate setup utility project
 
-from setuptools.command.test import test as TestCommand
-from setuptools_behave import behave_test 
-import sys
-import os
-from setuptools import Command
 import glob
+import os
+import sys
+
+from setuptools import Command
+from setuptools.command.test import test as TestCommand
+
 
 try:
     from setupext import janitor
@@ -32,7 +33,11 @@ try:
 except ImportError:
     CleanCommand = None
 
-BehaveTestCommand = behave_test
+try:
+    from setuptools_behave import behave_test
+    BehaveTestCommand = behave_test
+except ImportError:
+    BehaveTestCommand = None
 
 
 class ToxCommand(TestCommand):
@@ -55,7 +60,7 @@ class ToxCommand(TestCommand):
         import tox
         import shlex
         errno = tox.cmdline(args=shlex.split(self.tox_args))
-        sys.exit(errno)    
+        sys.exit(errno)
 
 
 class LicenseHeaderCommand(Command):
@@ -66,7 +71,7 @@ class LicenseHeaderCommand(Command):
     user_options = [
         ('header-file=', 'f', 'header license file'),
         ('extension=', 'e', 'source file extension'),
-        ]
+    ]
 
     def initialize_options(self):
         self.header_file = 'HEADER'
@@ -78,7 +83,8 @@ class LicenseHeaderCommand(Command):
 
     def run(self):
         if not os.path.isfile(self.header_file):
-            raise Exception("header file '%s' is not a file" % self.header_file)
+            raise Exception("header file '%s' is not a file" %
+                            self.header_file)
         for filename in glob.iglob("**/*%s" % self.extension, recursive=True):
             print(filename)
             with open(filename, 'r') as file:
@@ -88,7 +94,7 @@ class LicenseHeaderCommand(Command):
                       'removing_previous_comments',
                       'adding_header',
                       'adding_source')
-            phase = phases[0] 
+            phase = phases[0]
             for line in lines:
                 assert phase in phases, '%s not in %s' % (phase, phases)
                 if phase == phases[0]:
@@ -103,13 +109,12 @@ class LicenseHeaderCommand(Command):
                         phase = phases[2]
                 if phase == phases[2]:
                     with open(self.header_file, 'r') as header_file:
-                        header_lines = [l if l.endswith('\n') 
-                                          else l + '\n' for l in header_file.readlines()]
+                        header_lines = [l if l.endswith('\n')
+                                        else l + '\n' for l in header_file.readlines()]
                         output.extend(['# ' + l for l in header_lines])
                     phase = phases[3]
                 if phase == phases[3]:
-                    output.append(line)  
+                    output.append(line)
             with open(filename, 'w') as file:
                 for line in output:
-                    file.write(line)  
-
+                    file.write(line)
