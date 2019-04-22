@@ -29,7 +29,7 @@ class Test(unittest.TestCase):
 
     def test_fit(self):
         sgd = LinearSGDRegression()
-        wines = pd.read_csv('../data/wines/winequality-red.csv', sep=';')
+        wines = pd.read_csv('data/wines/winequality-red.csv', sep=';')
         train_features, train_responses = split_feature_response(
             wines, 'quality')
         errors = sgd.fit(train_features, train_responses)
@@ -37,7 +37,7 @@ class Test(unittest.TestCase):
 
     def test_predict(self):
         sgd = LinearSGDRegression()
-        wines = pd.read_csv('../data/wines/winequality-red.csv', sep=';')
+        wines = pd.read_csv('data/wines/winequality-red.csv', sep=';')
         train_features, train_responses = split_feature_response(
             wines, 'quality')
         sgd.fit(train_features, train_responses)
@@ -46,7 +46,7 @@ class Test(unittest.TestCase):
 
     def test_evaluate(self):
         sgd = LinearSGDRegression()
-        wines = pd.read_csv('../data/wines/winequality-red.csv', sep=';')
+        wines = pd.read_csv('data/wines/winequality-red.csv', sep=';')
         feature_column = 'quality'
         for column in wines.columns:
             if column != feature_column:
