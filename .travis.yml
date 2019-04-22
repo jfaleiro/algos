@@ -1,5 +1,6 @@
 language: python
 python:
    - "3.6"
-install: pip install --upgrade pip setuptools
+# travis only goes up to 3.6, can't find setupext-janitor 
+install: pip install --upgrade pip setuptools setupext-janitor 
 script: python setup.py build test
