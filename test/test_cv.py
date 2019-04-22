@@ -27,7 +27,7 @@ import unittest.mock as mock
 class Test(unittest.TestCase):
 
     def test_split_feature_response(self):
-        wines = pd.read_csv('../data/wines/winequality-red.csv', sep=';')
+        wines = pd.read_csv('data/wines/winequality-red.csv', sep=';')
         feature_column = 'quality'
         f, r = split_feature_response(wines, feature_column)
         self.assertEqual(len(wines), len(f))
@@ -52,7 +52,7 @@ class Test(unittest.TestCase):
         self.assertEqual(5, len(folds))
 
     def test_evaluate(self):
-        wines = pd.read_csv('../data/wines/winequality-red.csv', sep=';')
+        wines = pd.read_csv('data/wines/winequality-red.csv', sep=';')
         feature_column = 'quality'
 
         algo = mock.MagicMock()

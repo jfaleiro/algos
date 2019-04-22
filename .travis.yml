@@ -1,0 +1,5 @@
+language: python
+python:
+   - "3.7"
+install: pip install --upgrade pip setuptools
+script: python setup.py build test behave_test
