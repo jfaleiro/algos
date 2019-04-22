@@ -2,4 +2,4 @@ language: python
 python:
    - "3.6"
 install: pip install --upgrade pip setuptools
-script: python setup.py build test behave_test
+script: python setup.py build test
